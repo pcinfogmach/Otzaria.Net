@@ -1,0 +1,58 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35327.3
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OtzariaInWord", "OtzariaInWord\OtzariaInWord.csproj", "{EC7BBCB9-3A0C-4D72-BF50-805FD40C777E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Otzaria.Net", "Otzaria.Net\Otzaria.Net.csproj", "{E1EBE935-52BD-457D-8A48-AB42F5D196D0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OtzariaTestApp", "OtzariaTestApp\OtzariaTestApp.csproj", "{BA3254C2-6E94-407C-A1F2-88861281BB37}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Backup", "Backup", "{AD04A8A3-9DEC-401C-B82F-AE4D1251A2A1}"
+	ProjectSection(SolutionItems) = preProject
+		FileSystemItem.cs = FileSystemItem.cs
+		FileSystemViewModel.cs = FileSystemViewModel.cs
+		HtmlBuilder.cs = HtmlBuilder.cs
+		lucene.cs = lucene.cs
+		קישורים.txt = קישורים.txt
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BackupClassLibrary", "BackupClassLibrary\BackupClassLibrary.csproj", "{E6853E59-DA18-4BE5-B2AF-ED7D065624EB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileSystemBrowser", "FileSystemBrowser\FileSystemBrowser.csproj", "{0DA43A51-04D7-4E1E-B691-1337E7F730CA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EC7BBCB9-3A0C-4D72-BF50-805FD40C777E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EC7BBCB9-3A0C-4D72-BF50-805FD40C777E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EC7BBCB9-3A0C-4D72-BF50-805FD40C777E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EC7BBCB9-3A0C-4D72-BF50-805FD40C777E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E1EBE935-52BD-457D-8A48-AB42F5D196D0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E1EBE935-52BD-457D-8A48-AB42F5D196D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E1EBE935-52BD-457D-8A48-AB42F5D196D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E1EBE935-52BD-457D-8A48-AB42F5D196D0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BA3254C2-6E94-407C-A1F2-88861281BB37}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BA3254C2-6E94-407C-A1F2-88861281BB37}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BA3254C2-6E94-407C-A1F2-88861281BB37}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BA3254C2-6E94-407C-A1F2-88861281BB37}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E6853E59-DA18-4BE5-B2AF-ED7D065624EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E6853E59-DA18-4BE5-B2AF-ED7D065624EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E6853E59-DA18-4BE5-B2AF-ED7D065624EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E6853E59-DA18-4BE5-B2AF-ED7D065624EB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0DA43A51-04D7-4E1E-B691-1337E7F730CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0DA43A51-04D7-4E1E-B691-1337E7F730CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0DA43A51-04D7-4E1E-B691-1337E7F730CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0DA43A51-04D7-4E1E-B691-1337E7F730CA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {BEC4144D-96C6-41C6-B30C-B8D49BD94C09}
+	EndGlobalSection
+EndGlobal

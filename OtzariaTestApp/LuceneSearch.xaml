@@ -1,0 +1,27 @@
+﻿<UserControl x:Class="OtzariaTestApp.LuceneSearch"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:OtzariaTestApp"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <StackPanel Orientation="Horizontal" Margin="10">
+            <TextBox x:Name="SearchBox" Width="400" Margin="0,0,10,0" TextChanged="SearchBox_TextChanged" />
+            <Button Content="Index Folder" Width="100" Click="IndexFolderButton_Click" />
+        </StackPanel>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="3*" />
+            </Grid.ColumnDefinitions>
+            <ListView x:Name="ResultsList" SelectionChanged="ResultsList_SelectionChanged" />
+            <TextBox x:Name="FileContentBox" Grid.Column="1" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" />
+        </Grid>
+    </Grid>
+</UserControl>
