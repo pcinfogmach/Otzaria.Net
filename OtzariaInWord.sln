@@ -11,16 +11,24 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OtzariaTestApp", "OtzariaTe
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Backup", "Backup", "{AD04A8A3-9DEC-401C-B82F-AE4D1251A2A1}"
 	ProjectSection(SolutionItems) = preProject
+		bindingproxy.txt = bindingproxy.txt
 		FileSystemItem.cs = FileSystemItem.cs
 		FileSystemViewModel.cs = FileSystemViewModel.cs
+		FileView.cs = FileView.cs
 		HtmlBuilder.cs = HtmlBuilder.cs
+		Links.cs = Links.cs
 		lucene.cs = lucene.cs
+		Markupextesion.txt = Markupextesion.txt
+		ToggleNikud.cs = ToggleNikud.cs
+		XMLFile1.xml = XMLFile1.xml
 		קישורים.txt = קישורים.txt
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BackupClassLibrary", "BackupClassLibrary\BackupClassLibrary.csproj", "{E6853E59-DA18-4BE5-B2AF-ED7D065624EB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileSystemBrowser", "FileSystemBrowser\FileSystemBrowser.csproj", "{0DA43A51-04D7-4E1E-B691-1337E7F730CA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileViewer", "FileViewer\FileViewer.csproj", "{634BBA58-E0DF-4CE0-816A-B669D5C48938}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -48,6 +56,10 @@ Global
 		{0DA43A51-04D7-4E1E-B691-1337E7F730CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0DA43A51-04D7-4E1E-B691-1337E7F730CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0DA43A51-04D7-4E1E-B691-1337E7F730CA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{634BBA58-E0DF-4CE0-816A-B669D5C48938}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{634BBA58-E0DF-4CE0-816A-B669D5C48938}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{634BBA58-E0DF-4CE0-816A-B669D5C48938}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{634BBA58-E0DF-4CE0-816A-B669D5C48938}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

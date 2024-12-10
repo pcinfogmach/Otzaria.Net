@@ -4,132 +4,26 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Otzaria.Net"
-             xmlns:c="clr-namespace:Otzaria.Net.Controls"
-             xmlns:m="clr-namespace:Otzaria.Net.Models"
+             xmlns:fs="clr-namespace:FileSystemBrowser"
              mc:Ignorable="d"
              FlowDirection="RightToLeft"
              d:DesignHeight="450" d:DesignWidth="800" FontFamily="Segoe UI Semilight"
              FontSize="14">
-    <UserControl.DataContext>
-        <local:OtzariaViewModel x:Name="viewModel"/>
-    </UserControl.DataContext>
-
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="Themes\Merged.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/Otzaria.Net;component/Themes/Generic.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
+    
     <Grid>
-        
         <Grid.RowDefinitions>
-            <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
 
-        <TabControl x:Name="tabControl" Grid.Row="1">
-            <TabItem Header="אילן ספרים">
-                <c:CostumeTreeView x:Name="OtzariaFileSystemTree"
-                                   ItemsSource="{Binding OtzariaFileSystem.Children}">
-                    <c:CostumeTreeView.Resources>
-                        <!-- Template for Folder -->
-                        <HierarchicalDataTemplate DataType="{x:Type m:FolderSystemItem}" ItemsSource="{Binding Children}">
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="🖿 " Foreground="#FFF6D572" FontWeight="Bold"/>
-                                <TextBlock Text="{Binding Name}" />
-                            </StackPanel>
-                        </HierarchicalDataTemplate>
-
-                        <HierarchicalDataTemplate DataType="{x:Type m:HtmlFileSystemItem}" ItemsSource="{Binding HtmlTags}">
-                            <c:ListButton Click="FileSystemItem_Button_Click">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="🗎 " Foreground="DarkCyan" FontWeight="ExtraBold"/>
-                                    <TextBlock Text="{Binding Name}" />
-                                </StackPanel>
-                            </c:ListButton>
-                        </HierarchicalDataTemplate>
-
-                        <!-- Template for File -->
-                        <DataTemplate DataType="{x:Type m:FileSystemItem}">
-                            <c:ListButton Click="FileSystemItem_Button_Click">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="🗎 " Foreground="DarkCyan"/>
-                                    <TextBlock Text="{Binding Name}" />
-                                </StackPanel>
-                            </c:ListButton>
-                        </DataTemplate>
-
-                        <DataTemplate DataType="{x:Type m:PdfFileSystemItem}">
-                            <c:ListButton Click="FileSystemItem_Button_Click">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="🗎 " Foreground="red"/>
-                                    <TextBlock Text="{Binding Name}" />
-                                </StackPanel>
-                            </c:ListButton>
-                        </DataTemplate>
-                    </c:CostumeTreeView.Resources>
-                </c:CostumeTreeView>
-            </TabItem>
-
-            <TabItem Header="תצוגה">
-                <c:OtzariaFileViewer x:Name="fileViewer"/>
-            </TabItem>
-        </TabControl>
-
-        <StackPanel>
-            <c:PlaceHolderTextBox x:Name="SearchTextBox"
-                     PlaceHolderText="הזן טקסט לחיפוש..."
-                     Text="{Binding SearchTerm, UpdateSourceTrigger=PropertyChanged}"
-                     PreviewKeyDown="SearchTextBox_PreviewKeyDown"/>
-
-            <Popup x:Name="SearchResultPopup" IsOpen="{Binding HasSearchResults, Mode=OneWay}" StaysOpen="False"
-                   Placement="Bottom" PlacementTarget="{Binding ElementName=SearchTextBox}">
-
-                <ListBox x:Name="SearchResultsListBox" ItemsSource="{Binding SearchResults}" 
-                         Height="{Binding ActualHeight, ElementName=OtzariaFileSystemTree}"
-                         MaxWidth="{Binding ActualWidth, ElementName=OtzariaFileSystemTree}">
-                    <ListBox.Resources>
-                        <DataTemplate DataType="{x:Type m:FileSystemItem}">
-                            <Button Style="{StaticResource ListBoxButton}" Click="FileSystemItem_Button_Click">
-                                <StackPanel>
-                                    <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="🗎 " Foreground="DarkCyan"/>
-                                        <TextBlock Text="{Binding Name}" />
-                                    </StackPanel>
-                                    <TextBlock TextWrapping="WrapWithOverflow" FontSize="10" Opacity="0.5">
-                                        <TextBlock.Text>
-                                            <MultiBinding StringFormat="{}{0} \ {1}">
-                                                <Binding Path="ParentDirectory" />
-                                                <Binding Path="Extension" />
-                                            </MultiBinding>
-                                        </TextBlock.Text>
-                                    </TextBlock>
-                                </StackPanel>
-                            </Button>
-                        </DataTemplate>
-
-                        <DataTemplate DataType="{x:Type m:PdfFileSystemItem}">
-                            <Button Style="{StaticResource ListBoxButton}" Click="FileSystemItem_Button_Click">
-                                <StackPanel>
-                                    <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="🗎 " Foreground="red"/>
-                                        <TextBlock Text="{Binding Name}" />
-                                    </StackPanel>
-                                    <TextBlock TextWrapping="WrapWithOverflow" FontSize="10" Opacity="0.5">
-                                        <TextBlock.Text>
-                                            <MultiBinding StringFormat="{}{0} \ {1}">
-                                                <Binding Path="ParentDirectory" />
-                                                <Binding Path="Extension" />
-                                            </MultiBinding>
-                                        </TextBlock.Text>
-                                    </TextBlock>
-                                </StackPanel>
-                            </Button>
-                        </DataTemplate>
-                    </ListBox.Resources>
-                </ListBox>
-            </Popup>
-        </StackPanel>
+        <fs:FsViewerControl Style="{StaticResource FileSystemNavControl}"
+                            RootDirectory="C:\אוצריא\אוצריא"/>
     </Grid>
 </UserControl>

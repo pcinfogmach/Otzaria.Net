@@ -1,0 +1,3 @@
+I've found that the discoverability of the markup extension depends on how the XML namespace is defined: xmlns:my="clr-namespace:MyNamespace1.MyNamespace2" compiles and finds the markup extensions, whereas xmlns:my="clr-namespace:MyNamespace1.MyNamespace2;assembly=MyAssembly" doesn't. – 
+Zev Spitz
+Commented Dec 8, 

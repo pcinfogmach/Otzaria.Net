@@ -1,0 +1,197 @@
+﻿<UserControl x:Class="FileViewer.FileViewerControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:FileViewer"
+             xmlns:h="clr-namespace:MyHelpers"
+             xmlns:fs="clr-namespace:FileSystemBrowser"
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
+             xmlns:controls="clr-namespace:System.Windows.Controls;assembly=PresentationFramework"
+             mc:Ignorable="d" 
+             d:Height="450" d:Width="320"
+             FlowDirection="RightToLeft"
+             x:Name="Fv">
+    
+    <UserControl.DataContext>
+        <local:FileViewerViewModel x:Name="vm"/>
+    </UserControl.DataContext>
+    <Grid>
+        <Grid.Resources>
+            <system:Double x:Key="ToolBarHeight">38</system:Double>
+        </Grid.Resources>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Border x:Name="ToolbarBorder" Height="{StaticResource ToolBarHeight}"
+            Background="{x:Static SystemColors.ControlLightLightBrush}">
+            <Border.Effect>
+                <DropShadowEffect ShadowDepth="1" Color="LightGray" BlurRadius="1"/>
+            </Border.Effect>
+            <StackPanel Orientation="Horizontal">
+                <UniformGrid Rows="1">
+
+                    <ToggleButton x:Name="NavigationToggleButton">
+                        <Path Data="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z" 
+                              Stretch="Fill" Width="12" Height="10"/>
+                        <!--<ToggleButton.Style>
+                            <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource {x:Type ToggleButton}}">
+                                <Setter Property="IsHitTestVisible" Value="True"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ElementName=NavigationPopup, Path=IsOpen}" Value="True">
+                                        <Setter Property="IsHitTestVisible" Value="False"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ToggleButton.Style>-->
+                    </ToggleButton>
+                    
+                    <!--<Popup  x:Name="NavigationPopup"
+                               IsOpen="{Binding IsChecked, ElementName=NavigationToggleButton}"
+                               PlacementTarget="{Binding ElementName=NavigationToggleButton}"
+                               Placement="Bottom" StaysOpen="False"
+                               MaxWidth="{Binding ActualWidth, ElementName=Fv, Converter={StaticResource IntDivideConverter}, ConverterParameter=2}" 
+                               Height="{Binding ActualHeight, ElementName=Fv, Converter={StaticResource IntDivideConverter}, ConverterParameter=2}">
+                        <Border BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}" BorderThickness="0.5">
+                            <fs:FsViewerControl x:Name="FsChapterViewer" Style="{StaticResource HtmlNavControl}"/>
+                        </Border>
+                    </Popup>-->
+
+                    <ToggleButton x:Name="FontFamilyButton"
+                                  IsChecked="{Binding ShowFonts}">
+                        <Path Height="10" Width="15"
+                              Data="M17,8H20V20H21V21H17V20H18V17H14L12.5,20H14V21H10V20H11L17,8M18,9L14.5,16H18V9M5,3H10C11.11,3 12,3.89 12,5V16H9V11H6V16H3V5C3,3.89 3.89,3 5,3M6,5V9H9V5H6Z"/>
+                        <ToggleButton.Style>
+                            <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource {x:Type ToggleButton}}">
+                                <Setter Property="IsHitTestVisible" Value="True"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ElementName=FontStylePopup, Path=IsOpen}" Value="True">
+                                        <Setter Property="IsHitTestVisible" Value="False"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ToggleButton.Style>
+                    </ToggleButton>
+                    
+                    <Popup x:Name="FontStylePopup"
+                           IsOpen="{Binding ShowFonts}"
+                           PlacementTarget="{Binding ElementName=FontFamilyButton}"
+                           Placement="Bottom" StaysOpen="False"
+                           MaxHeight="250" 
+                           MaxWidth="{Binding ActualWidth, ElementName=Fv, Converter={StaticResource IntDivideConverter}, ConverterParameter=2}">
+                        <ListBox ItemsSource="{Binding FontList}" SelectedItem="{Binding FontFamily}">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="{Binding}" FontFamily="{Binding}"/>
+                                        <TextBlock Text="   אבג דהו" FontFamily="{Binding}"
+                                                   Opacity="0.5" HorizontalAlignment="Right"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </Popup>
+                    
+                    <RepeatButton x:Name="IncreaseFontSizeButton" Command="{Binding IncreaseFontSizeCommand}" 
+                                  ToolTipService.InitialShowDelay="0"
+                                  ToolTipService.ShowDuration="100000">
+                        <RepeatButton.ToolTip>
+                            <TextBlock>
+                                <Span FontWeight="Bold">הגדל גופן</Span><LineBreak/>
+                                <Run FontSize="10" Text="{Binding FontSize, StringFormat=גודל נוכחי {0}%, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                            </TextBlock>
+                        </RepeatButton.ToolTip>
+                        <Path Height="10" Width="15"
+                    Data="M5.12,14L7.5,7.67L9.87,14M6.5,5L1,19H3.25L4.37,16H10.62L11.75,19H14L8.5,5H6.5M18,7L13,12.07L14.41,13.5L17,10.9V17H19V10.9L21.59,13.5L23,12.07L18,7Z"/>
+                    </RepeatButton>
+
+                    <RepeatButton x:Name="DecreaseFontSizeButton" Command="{Binding DecreaseFontSizeCommand}"
+                                  ToolTipService.InitialShowDelay="0"
+                                  ToolTipService.ShowDuration="100000">
+                        <RepeatButton.ToolTip>
+                            <TextBlock>
+                                 <Span FontWeight="Bold">הקטן גופן</Span><LineBreak/>
+                                 <Run FontSize="10" Text="{Binding FontSize, StringFormat=גודל נוכחי {0}%, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                            </TextBlock>
+                        </RepeatButton.ToolTip>
+                        <Path Height="10" Width="15"
+                    Data="M5.12,14L7.5,7.67L9.87,14M6.5,5L1,19H3.25L4.37,16H10.62L11.75,19H14L8.5,5H6.5M18,17L23,11.93L21.59,10.5L19,13.1V7H17V13.1L14.41,10.5L13,11.93L18,17Z"/>
+                    </RepeatButton>
+
+                    <ToggleButton x:Name="CantillationsToggeleButton"
+                                  ToolTip="הצג / הסתר טעמים"
+                                  Style="{StaticResource TooggleRemoveStyle}"
+                                  Command="{Binding ToggleCantillationsCommand, ElementName=fileView}">
+                        <Path
+                         Height="10" Width="10" 
+                         Data="M17 .8A15 10.95 0 0123 .65V-14.78H17V.8M0 21H6A10 10 90 0135 21H41A20 20 90 000 21"/>
+                    </ToggleButton>
+                    
+                    <ToggleButton x:Name="NikudToggleButton"
+                                  ToolTip="הצג / הסתר ניקוד ופיסוק"
+                                  Style="{StaticResource TooggleRemoveStyle}"
+                                  Command="{Binding ToggleNikudCommand, ElementName=fileView}">
+                        <Path Height="8" Width="15" FlowDirection="RightToLeft"
+                             Data="M1226 681C1261 704 1330 706 1370 685 1418 660 1440 619 1440 556 1440 504 1437 497 1400 460S1356 420 1304 420C1213 420 1160 473 1160 562 1160 611 1184 653 1226 681ZM270 1055V1140H590 910V1055 970H779 648L652 863C655 759 657 753 693 693 736 622 742 563 711 517 635 402 460 451 458 589 458 617 469 650 499 704 541 779 541 779 538 872L535 965 403 968 270 971V1055ZM1217 1139C1254 1166 1334 1167 1374 1141 1465 1081 1463 943 1370 895 1330 874 1261 876 1226 899 1141 955 1136 1078 1217 1139Z" RenderTransformOrigin="0.5,0.5" Stretch="Fill">
+                            <Path.RenderTransform>
+                                <RotateTransform Angle="180.327" />
+                            </Path.RenderTransform>
+                        </Path>
+                    </ToggleButton>
+                    
+                    <!--<ToggleButton x:Name="PonctuationToggleButton"
+                                  Style="{StaticResource TooggleRemoveStyle}"
+                                  Command="{Binding TogglePunctuationCommand, ElementName=fileView}"
+                        Content=";?!" FontWeight="DemiBold"/>-->
+                    
+                    <ToggleButton x:Name="BlockInlineToggleButton" ToolTip="תצוגה ברצף / בשורות נפרדות"
+                                  Command="{Binding ToggleBlockInlineCommand, ElementName=fileView}">
+                        <ToggleButton.Template>
+                            <ControlTemplate TargetType="ToggleButton">
+                                <Border x:Name="border" Background="{TemplateBinding Background}">
+                                    <Path x:Name="ToggleLinesButtonIcon" Style="{StaticResource {x:Type Path}}"
+                                    Height="10" Width="10"
+                                    Data="M3,3H21V5H3V3M9,7H21V9H9V7M3,11H21V13H3V11M9,15H21V17H9V15M3,19H21V21H3V19Z"/>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <DataTrigger Binding="{Binding IsChecked, RelativeSource={RelativeSource Self}}" Value="True">
+                                        <Setter TargetName="ToggleLinesButtonIcon" Property="Data" 
+                                            Value="M3,3H21V5H3V3M3,7H21V9H3V7M3,11H21V13H3V11M3,15H21V17H3V15M3,19H21V21H3V19Z"/>
+                                    </DataTrigger>
+                                    <Trigger Property="IsMouseOver" Value="true">
+                                        <Setter Property="Background" TargetName="border" Value="#FFC4E5F6"/>
+                                        <Setter Property="BorderBrush" TargetName="border" Value="#FF2C628B"/>
+                                    </Trigger>
+                                    <Trigger Property="IsPressed" Value="true">
+                                        <Setter Property="Background" TargetName="border" Value="#FFC4E5F6"/>
+                                        <Setter Property="BorderBrush" TargetName="border" Value="#FF2C628B"/>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </ToggleButton.Template>
+                    </ToggleButton>
+                </UniformGrid>
+            </StackPanel>
+        </Border>
+
+        <Grid  Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Border  MaxWidth="{Binding ActualWidth, ElementName=Fv, Converter={StaticResource IntDivideConverter}, ConverterParameter=2}"  
+                    Visibility="{Binding IsChecked, ElementName=NavigationToggleButton, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <fs:FsViewerControl x:Name="FsChapterViewer" Style="{StaticResource HtmlNavControl}"/>
+            </Border>
+            <local:FileView x:Name="fileView" Grid.Column="1"
+                  FlowDirection="LeftToRight"
+                  FontSize="{Binding FontSize}"
+                  FontFamily="{Binding FontFamily}"
+                  SelectedItem="{Binding DataContext.SelectedItem, ElementName=FsChapterViewer}"/>
+        </Grid>
+    </Grid>
+</UserControl>

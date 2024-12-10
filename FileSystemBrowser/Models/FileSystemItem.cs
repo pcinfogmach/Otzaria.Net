@@ -50,12 +50,12 @@ namespace FileSystemBrowser.Models
         public string Path { get; set; }
         public string Tags { get; set; }
         public bool IsDirectory { get; set; }
-        public int Level { get; set; } = 0; // for usge with html file 
+        public int Level { get; set; } = -10;
         public bool HasChildren { get => Children.Count > 0; }
         public FileSystemItem Parent;
         public ObservableCollection<FileSystemItem> Children { get; set; } = new ObservableCollection<FileSystemItem>();
 
-        public FileSystemItem(string rootDirectory, string path, bool isDirectory, FileSystemItem parent = null, string name = "")
+        public FileSystemItem(string rootDirectory, string path, bool isDirectory, int level, FileSystemItem parent = null, string name = "")
         {
             Path = path;
             Name = string.IsNullOrEmpty(name) ? System.IO.Path.GetFileNameWithoutExtension(path) : name;
@@ -64,8 +64,9 @@ namespace FileSystemBrowser.Models
                 .Trim('\\')
                 .Replace("\\", " \\ ");
             IsDirectory = isDirectory;
+            Level = level;
             Parent = parent;
-
+            
             if (isDirectory) LoadChildren(rootDirectory);
         }
 
@@ -82,7 +83,7 @@ namespace FileSystemBrowser.Models
 
             foreach (var directory in directories)
             {
-                Children.Add(new FileSystemItem(rootDirectory, directory, true, this));
+                Children.Add(new FileSystemItem(rootDirectory, directory, true, Level + 1, this));
             }
 
             var files = Directory.GetFiles(Path)
@@ -95,9 +96,9 @@ namespace FileSystemBrowser.Models
             foreach (var file in files)
             {
                 if (System.IO.Path.GetExtension(file).ToLower().Contains("txt") || System.IO.Path.GetExtension(file).ToLower().Contains("html"))
-                    Children.Add(new HtmlFileSystemItem(rootDirectory, file, false, this));
+                    Children.Add(new HtmlFileSystemItem(rootDirectory, file, false, Level + 1, this));
                 else 
-                    Children.Add(new FileSystemItem(rootDirectory, file, false, this));
+                    Children.Add(new FileSystemItem(rootDirectory, file, false, Level + 1, this));
             }
         }
     }

@@ -4,7 +4,9 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:FileSystemBrowser.Browser"
+        xmlns:h="clr-namespace:FileSystemBrowser.Helpers"
         mc:Ignorable="d"
+        FlowDirection="RightToLeft"
        Title="File System Navigator" Height="450" Width="300">
     
     <Grid x:Name="FsGrid">
@@ -35,6 +37,7 @@
         
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         
@@ -47,14 +50,33 @@
             </Button>
             <!--<TextBlock Text="{Binding CurrentDirectory}" Margin="3"/>-->
             <TextBox Width="200" Margin="3"
-                     Text="{Binding SearchTerm, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                     Text="{Binding SearchTerm, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                     TextAlignment="Center"
+                     VerticalContentAlignment="Center"
+                     h:SelectAllFocusBehavior.Enable="True">
+                <TextBox.InputBindings>
+                    <KeyBinding Key="Return" Command="{Binding SearchCommand}"/>
+                    <KeyBinding Key="Esc" Command="{Binding ClearSearchCommand}"/>
+                </TextBox.InputBindings>
+            </TextBox>
         </StackPanel>
 
-        <ListBox Grid.Row="1"
+        <ProgressBar Grid.Row="1"
+                     IsIndeterminate="{Binding IsSearching}"
+                     Height="3" Background="Transparent" BorderThickness="0"/>
+        
+        <ListBox Grid.Row="2"
                 ItemsSource="{Binding Items}"
-                SelectionMode="Single">
+                SelectionMode="Single"
+                ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                h:ListBoxKeyUpDownBehaviour.Enable="True">
+            <ListBox.InputBindings>
+                <KeyBinding Key="Esc" Command="{Binding GoBackCommand}"/>
+                <KeyBinding Key="Home" Command="{Binding GoHomeCommand}"/>
+            </ListBox.InputBindings>
             <ListBox.ItemContainerStyle>
                 <Style TargetType="{x:Type ListBoxItem}">
+                    <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
                     <Setter Property="Template">
                         <Setter.Value>
                             <ControlTemplate TargetType="{x:Type ListBoxItem}">
@@ -62,6 +84,11 @@
                             </ControlTemplate>
                         </Setter.Value>
                     </Setter>
+                    <Style.Triggers>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="Background" Value="#FFBEE6FD"/>
+                        </Trigger>
+                    </Style.Triggers>
                 </Style>
             </ListBox.ItemContainerStyle>
             <ListBox.ItemTemplate>
@@ -74,15 +101,17 @@
 
                         <Button Grid.Column="0"
                             HorizontalContentAlignment="Left" 
+                                FocusVisualStyle="{x:Null}"
                             Command="{Binding DataContext.NavigateToItemCommand, ElementName=FsGrid}" 
-                            CommandParameter="{Binding}">
+                            CommandParameter="{Binding}"
+                            Background="{Binding Background, RelativeSource={RelativeSource AncestorType=ListBoxItem}}">
                             <StackPanel>
                                 <TextBlock Text="{Binding Name}"/>
                                 <TextBlock x:Name="TagsBlock" Text="{Binding Tags}" Opacity="0.5"/>
                             </StackPanel>
                         </Button>
                         <Button x:Name="ChaptersExpanderButton" Grid.Column="1"
-                                Command="{Binding DataContext.LoadChildrenCommand , ElementName=FsGrid}"
+                                Command="{Binding DataContext.LoadHtmlTagsCommand , ElementName=FsGrid}"
                                 CommandParameter="{Binding}">
                             <Path Fill="Black" Data="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"
                                   Height="10" Width="10" Stretch="Fill"

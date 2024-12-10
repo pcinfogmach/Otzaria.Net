@@ -24,15 +24,5 @@ namespace OtzariaTestApp
         {
             InitializeComponent();
         }
-
-        private async void Button_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                var service = new SQLiteFTS4Service();
-                await service.IndexFolder("C:\\אוצריא\\אוצריא");
-            }
-            catch (Exception ex) {Console.WriteLine(ex.Message); }
-        }
     }
 }

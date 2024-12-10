@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace FileSystemBrowser.Models
@@ -9,22 +10,37 @@ namespace FileSystemBrowser.Models
     public class HtmlFileSystemItem : FileSystemItem
     {
         public bool IsTagsLoaded { get; set; }
+        private CancellationTokenSource _cancellationTokenSource;
 
-        public HtmlFileSystemItem(string rootDirectory, string path, bool isDirectory, FileSystemItem parent, string name = "", int level = 0)
-            : base(rootDirectory, path, isDirectory, parent, name)
+        public HtmlFileSystemItem(string rootDirectory, string path, bool isDirectory, int level, FileSystemItem parent, string name = "")
+            : base(rootDirectory, path, isDirectory, level, parent, name)
         {
-            Level = level;
+            _cancellationTokenSource = new CancellationTokenSource();
+        }
+
+        public void CancelLoadingTags()
+        {
+            if (!IsTagsLoaded) return;
+            _cancellationTokenSource.Cancel();
+            _cancellationTokenSource = new CancellationTokenSource();
+            Children = new ObservableCollection<FileSystemItem>();
+            IsTagsLoaded = false;
         }
 
         public async Task LoadTags(string rootDirectory)
         {
             if (IsTagsLoaded) return;
             IsTagsLoaded = true;
+
             Children = await Task.Run(() =>
             {
                 var headerTags = new ObservableCollection<FileSystemItem>();
                 try
                 {
+                    if (Path.Contains("דברי חמודות"))
+                    {
+                        Console.Write("");
+                    }
                     string content = System.IO.File.ReadAllText(Path);
                     string[] lines = content.Split(new char[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
 
@@ -40,7 +56,7 @@ namespace FileSystemBrowser.Models
 
                             string name = regexMatch.Groups[4].ToString();
 
-                            if (line.Trim().StartsWith("("))
+                            if (line.StartsWith("("))
                             {
                                 level = 7;
                                 name = regexMatch.Groups[2].ToString();
@@ -51,14 +67,15 @@ namespace FileSystemBrowser.Models
                             while (htmlParent.Parent is HtmlFileSystemItem htmlGrandParent && level <= htmlParent.Level)
                                 htmlParent = htmlGrandParent;
 
-                            if (htmlParent is HtmlFileSystemItem htmlItem)
-                                name = $"{htmlItem.Name} {name}";
+                            name = $"{htmlParent.Name} {name}";
 
-                            var newTagItem = new HtmlFileSystemItem(rootDirectory, Path, false, htmlParent, name, level);
+                            var newTagItem = new HtmlFileSystemItem(rootDirectory, Path, false, level, htmlParent, name);
+                            
                             if (htmlParent == this)
                                 headerTags.Add(newTagItem);
                             else
                                 htmlParent.Children.Add(newTagItem);
+
                             htmlParent = newTagItem;
                         }
                     }
@@ -66,7 +83,7 @@ namespace FileSystemBrowser.Models
                 catch (Exception ex) { Debug.WriteLine(ex.Message); }
 
                 return headerTags;
-            });
+            }, _cancellationTokenSource.Token);
         }
     }
 }

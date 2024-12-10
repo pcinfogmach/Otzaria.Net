@@ -1,12 +1,10 @@
 ﻿using FileSystemBrowser.Helpers;
 using FileSystemBrowser.Models;
 using System.Collections.ObjectModel;
-using System.IO;
 using System.Windows.Input;
 using System.Linq;
 using System;
 using System.Collections.Generic;
-using System.Windows;
 using System.Threading.Tasks;
 using System.Threading;
 
@@ -14,53 +12,90 @@ namespace FileSystemBrowser.Browser
 {
     public class FileSystemViewModel : ViewModelBase
     {
+        private Timer _unloadTimer;
+        private const int UnloadTimeoutMilliseconds = 60000; // Adjust the timeout as needed
+
         private FileSystemItem currentDirectory;
-        private string _searchTerm;
+        private string _previousSearchTerm = "";
+        private string _searchTerm = "";
+        bool _isSearching = false;
         private ObservableCollection<FileSystemItem> _items;
         private FileSystemItem _rootItem;
-        private CancellationTokenSource _searchCancellationTokenSource;
 
-        public string SearchTerm { get => _searchTerm; set { SetProperty(ref _searchTerm, value); Search(value); } }
+        public string SearchTerm { get => _searchTerm; set { SetProperty(ref _searchTerm, value); Search(); } }
+        public bool IsSearching { get => _isSearching; set { SetProperty(ref _isSearching, value); } }
         public ObservableCollection<FileSystemItem> Items { get => _items; set => SetProperty(ref _items, value); }
 
         public ICommand GoBackCommand { get; }
         public ICommand GoHomeCommand { get; }
         public ICommand NavigateToItemCommand { get; }
-        public ICommand LoadChildrenCommand { get; }
+        public ICommand LoadHtmlTagsCommand { get; }
+        public ICommand SearchCommand { get; }
+        public ICommand ClearSearchCommand { get; }
 
         public FileSystemViewModel()
         {
             string rootDirectory = @"C:\אוצריא\אוצריא"; // Set your desired home directory
 
             // Initialize the root structure
-            _rootItem = new FileSystemItem(rootDirectory, rootDirectory, true);
+            _rootItem = new FileSystemItem(rootDirectory, rootDirectory, true, -10);
             currentDirectory = _rootItem;
             Items = _rootItem.Children;
 
             GoBackCommand = new RelayCommand(GoBack, CanGoBack);
             GoHomeCommand = new RelayCommand(GoHome);
             NavigateToItemCommand = new RelayCommand<FileSystemItem>(NavigateTo);
-            LoadChildrenCommand = new RelayCommand<FileSystemItem>(LoadChildren);
+            LoadHtmlTagsCommand = new RelayCommand<FileSystemItem>(LoadHtmlTags);
+            SearchCommand = new RelayCommand(Search);
+            ClearSearchCommand = new RelayCommand(() => SearchTerm = "");
+            StartUnloadTimer();
         }
 
-        private void GoBack()
+        private void StartUnloadTimer()
         {
-            if (currentDirectory != _rootItem)
+            _unloadTimer = new Timer(async state =>
             {
-                currentDirectory = currentDirectory.Parent;
-                Items = currentDirectory.Children;
+                await Task.Run(() => { Reset(_rootItem); }); // Unload children when timer elapses
+            }, null, UnloadTimeoutMilliseconds, Timeout.Infinite);
+        }
+
+        public void Reset(FileSystemItem currentItem)
+        {
+            if (currentItem is HtmlFileSystemItem htmlItem)
+                htmlItem.CancelLoadingTags();
+
+            foreach (var child in currentItem.Children)
+                Reset(child);
+        }
+
+        private async void GoBack()
+        {
+            if (currentDirectory.Parent != null) 
+            {
+                if (currentDirectory.Parent.IsDirectory)
+                {
+                    NavigateTo(currentDirectory.Parent);
+                }
+                else if (currentDirectory.Parent.Children.Count == 0)
+                {
+                    currentDirectory = SearchByPath(currentDirectory.Path, _rootItem);
+                    if (currentDirectory is HtmlFileSystemItem htmlItem) 
+                        await htmlItem.LoadTags(_rootItem.Path);
+                    Items = currentDirectory.Children;
+                }
+                else
+                {
+                    currentDirectory = currentDirectory.Parent;
+                    Items = currentDirectory.Children;
+                }
             }
         }
-
-        private void GoHome()
-        {
-            currentDirectory = _rootItem;
-            Items =_rootItem.Children;
-        }
+       
+        private void GoHome() => NavigateTo(_rootItem);
 
         public async void NavigateTo(FileSystemItem item)
         {
-            if (item.IsDirectory)
+            if (item != null && item.IsDirectory)
             {
                 currentDirectory = item;
 
@@ -74,41 +109,61 @@ namespace FileSystemBrowser.Browser
             }
         }
 
-        public void LoadChildren(FileSystemItem item)
+        public FileSystemItem SearchByPath(string filePath, FileSystemItem currentItem)
         {
-            if (!(item is HtmlFileSystemItem)) return;
-            Items = item.Children;
-            currentDirectory = item;
+            if (filePath == currentItem.Path)
+            {
+                return currentItem;
+            }
+                
+            foreach (var child in currentItem.Children)
+            {
+                var result = SearchByPath(filePath, child);
+                if (result != null)
+                    return result;
+            }
+
+            return null;
         }
 
-        private async void Search(string searchTerm)
+
+        public async void LoadHtmlTags(FileSystemItem item)
         {
-            if (string.IsNullOrWhiteSpace(searchTerm))
+            if (!(item is HtmlFileSystemItem htmlFile)) return;
+            
+            if (htmlFile.Children.Count == 0)
+                await htmlFile.LoadTags(_rootItem.Path);
+           
+            Items = htmlFile.Children;
+            currentDirectory = htmlFile;
+        }
+
+        private async void Search()
+        {
+            if (string.IsNullOrWhiteSpace(SearchTerm))
+            {
+                Items = currentDirectory.Children;
                 return;
+            }
+
+            IsSearching = true;
+            _previousSearchTerm = SearchTerm;
 
             // Split search terms and prepare results
-            var searchTerms = searchTerm.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            var SearchTerms = SearchTerm.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
             var results = new List<(FileSystemItem Item, int OriginalIndex)>();
 
             // Perform the search and capture the original index
             int index = 0;
-            SearchFileSystem(_rootItem, searchTerms, results, ref index);
-
-            // Order results by level and original index
-            var orderedResults = results
-                .OrderBy(r => r.Item.Level)
-                .ThenBy(r => r.OriginalIndex)
-                .Select(r => r.Item);
-
-            // Update the observable collection
-            Items = new ObservableCollection<FileSystemItem>(orderedResults);
+            SearchFileSystem(_rootItem, SearchTerms, results, ref index);
 
             // Load tags asynchronously for specific HTML items
-            if (searchTerm.Length > 3)
+            if (SearchTerm.Length > 3 && !_rootItem.Children.Any(c => SearchTerms.All(term => c.Name.Contains(term))))
             {
-                var htmlItems = orderedResults
+                var htmlItems = results
+                    .Select(r => r.Item)
                     .OfType<HtmlFileSystemItem>()
-                    .Where(item => item.Parent?.IsDirectory == true
+                    .Where(item => item.Parent.IsDirectory == true
                                    && !item.IsTagsLoaded
                                    && item.Children.Count == 0);
 
@@ -117,16 +172,25 @@ namespace FileSystemBrowser.Browser
                     await item.LoadTags(_rootItem.Path);
                 }
             }
+
+            // Order results by level and original index
+            var orderedResults = results
+                .OrderBy(r => r.Item.Name.Length)
+                .ThenBy(r => r.Item.Level)
+                .ThenBy(r => r.OriginalIndex)
+                .Select(r => r.Item);
+
+            // Update the observable collection
+            Items = new ObservableCollection<FileSystemItem>(orderedResults);
+
+            IsSearching = false;
         }
 
-        private void SearchFileSystem(
-            FileSystemItem item,
-            string[] terms,
-            List<(FileSystemItem Item, int OriginalIndex)> results,
-            ref int index)
+        private void SearchFileSystem(FileSystemItem item, string[] terms, List<(FileSystemItem Item, int OriginalIndex)> results,ref int index)
         {
+            string extendedName = item.Path + " " + item.Name;
             // Split item.Name into words using delimiters
-            var nameWords = item.Name.Split(new[] { ' ', '_', '-', '.', ',' }, StringSplitOptions.RemoveEmptyEntries);
+            var nameWords = extendedName.Split(new[] { ' ', '_', '-', ',', '/', '\\' }, StringSplitOptions.RemoveEmptyEntries);
 
             // Check if all terms are fully contained in the name words
             if (terms.All(term => nameWords.Contains(term, StringComparer.OrdinalIgnoreCase)))

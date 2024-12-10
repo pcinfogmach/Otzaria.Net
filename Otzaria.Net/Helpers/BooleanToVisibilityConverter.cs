@@ -1,0 +1,34 @@
+﻿using System;
+using System.Globalization;
+using System.Windows;
+using System.Windows.Data;
+
+namespace MyHelpers
+{
+    //public class BooleanToVisibilityConverter : IValueConverter
+    //{
+    //    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    //    {
+    //        if (value is bool boolValue)
+    //        {
+    //            if ((bool)parameter)
+    //                boolValue = !boolValue;
+
+    //            return boolValue ? Visibility.Visible : Visibility.Collapsed;
+    //        }
+
+    //        return Visibility.Collapsed;
+    //    }
+
+    //    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    //    {
+    //        if (value is Visibility visibility)
+    //        {
+    //            var result = visibility == Visibility.Visible;
+    //            return (bool)parameter ? !result : result;
+    //        }
+    //        return false;
+    //    }
+    //}
+
+}
