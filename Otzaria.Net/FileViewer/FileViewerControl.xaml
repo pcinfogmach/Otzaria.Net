@@ -45,28 +45,21 @@
                     <ToggleButton x:Name="NavigationToggleButton">
                         <Path Data="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z" 
                               Stretch="Fill" Width="12" Height="10"/>
-                        <!--<ToggleButton.Style>
-                            <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource {x:Type ToggleButton}}">
-                                <Setter Property="IsHitTestVisible" Value="True"/>
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding ElementName=NavigationPopup, Path=IsOpen}" Value="True">
-                                        <Setter Property="IsHitTestVisible" Value="False"/>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </ToggleButton.Style>-->
                     </ToggleButton>
-                    
-                    <!--<Popup  x:Name="NavigationPopup"
-                               IsOpen="{Binding IsChecked, ElementName=NavigationToggleButton}"
-                               PlacementTarget="{Binding ElementName=NavigationToggleButton}"
-                               Placement="Bottom" StaysOpen="False"
-                               MaxWidth="{Binding ActualWidth, ElementName=Fv, Converter={StaticResource IntDivideConverter}, ConverterParameter=2}" 
-                               Height="{Binding ActualHeight, ElementName=Fv, Converter={StaticResource IntDivideConverter}, ConverterParameter=2}">
-                        <Border BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}" BorderThickness="0.5">
-                            <fs:FsViewerControl x:Name="FsChapterViewer" Style="{StaticResource HtmlNavControl}"/>
-                        </Border>
-                    </Popup>-->
+
+                    <ToggleButton x:Name="LinksToggleButton" ToolTip="הפעל מצב פירושים וקישורים"
+                                  IsChecked="{Binding ElementName=fileView, Path=ToggleLinkMode}">
+                        <Grid Height="15">
+                            <Path Height="4" Width="8" VerticalAlignment="Bottom" HorizontalAlignment="Left"
+                                  Data="M3.9,12C3.9,10.29 5.29,8.9 7,8.9H11V7H7A5,5 0 0,0 2,12A5,5 0 0,0 7,17H11V15.1H7C5.29,15.1 3.9,13.71 3.9,12M8,13H16V11H8V13M17,7H13V8.9H17C18.71,8.9 20.1,10.29 20.1,12C20.1,13.71 18.71,15.1 17,15.1H13V17H17A5,5 0 0,0 22,12A5,5 0 0,0 17,7Z">
+                            </Path>
+                            <TextBlock Text="פ" FontSize="12" VerticalAlignment="Top" FontWeight="Bold" FontFamily="Yu Gothic">
+                                <TextBlock.LayoutTransform>
+                                    <RotateTransform Angle="-10"/>
+                                </TextBlock.LayoutTransform>
+                            </TextBlock>
+                        </Grid>
+                    </ToggleButton>
 
                     <ToggleButton x:Name="FontFamilyButton"
                                   IsChecked="{Binding ShowFonts}">
@@ -154,7 +147,7 @@
                                   Style="{StaticResource TooggleRemoveStyle}"
                                   Command="{Binding TogglePunctuationCommand, ElementName=fileView}"
                         Content=";?!" FontWeight="DemiBold"/>-->
-                    
+
                     <ToggleButton x:Name="BlockInlineToggleButton" ToolTip="תצוגה ברצף / בשורות נפרדות"
                                   Command="{Binding ToggleBlockInlineCommand, ElementName=fileView}">
                         <ToggleButton.Template>
@@ -181,6 +174,16 @@
                             </ControlTemplate>
                         </ToggleButton.Template>
                     </ToggleButton>
+
+                    <Button x:Name="GoToPreviousButton" ToolTip="עבור לקטע \ לפרק הקודם"
+                            Command="{Binding ElementName=fileView, Path=GoToPreviousCommand}">
+                        <Path Data="M4,11V13H16L10.5,18.5L11.92,19.92L19.84,12L11.92,4.08L10.5,5.5L16,11H4Z" Height="12" Width="10"/>
+                    </Button>
+
+                    <Button x:Name="GoToNextButton" ToolTip="עבור לקטע \ לפרק הבא"
+                            Command="{Binding ElementName=fileView, Path=GoToNextCommand}">
+                        <Path Data="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z" Height="12" Width="10"/>
+                    </Button>
                 </UniformGrid>
             </StackPanel>
         </Border>
@@ -191,15 +194,59 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <Border  MaxWidth="{Binding ActualWidth, ElementName=Fv, Converter={StaticResource IntDivideConverter}, ConverterParameter=2}"  
+            <TabControl MaxWidth="{Binding ActualWidth, ElementName=Fv, Converter={StaticResource IntDivideConverter}, ConverterParameter=2}"  
                     Visibility="{Binding IsChecked, ElementName=NavigationToggleButton, Converter={StaticResource BooleanToVisibilityConverter}}">
-                <fs:FsViewerControl x:Name="FsChapterViewer" Style="{StaticResource HtmlNavControl}"/>
-            </Border>
+                <TabControl.Resources>
+                    <Style TargetType="TabItem"/>
+                </TabControl.Resources>
+                
+                <TabItem Header="ניווט">
+                    <fs:FsViewerControl x:Name="FsChapterViewer" Style="{StaticResource HtmlNavControl}"/>
+                </TabItem>
+                <TabItem Header="קשרים" IsSelected="{Binding ToggleLinks, ElementName=fileView}">
+                    <ListBox ItemsSource="{Binding LinksViewModel.Links, ElementName=fileView, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                             MaxWidth="200"
+                             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                             BorderThickness="0"
+                             SelectionChanged="ListBox_SelectionChanged">
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem">
+                                <Setter Property="BorderBrush" Value="#C0C0C0"/>
+                                <Setter Property="BorderThickness" Value="0,0,0,0.3"/>
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding}" TextWrapping="WrapWithOverflow" Padding="3"/>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </TabItem>
+
+                <TabItem Header="פרשנים">
+                    <TreeView BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                              ItemsSource="{Binding LinksViewModel.CommentryFilters, ElementName=fileView}">
+                        <TreeView.ItemContainerStyle>
+                            <Style TargetType="TreeViewItem" BasedOn="{StaticResource CostumeTreeViewItem}"/>
+                        </TreeView.ItemContainerStyle>
+                        <TreeView.ItemTemplate>
+                            <HierarchicalDataTemplate ItemsSource="{Binding Children}">
+                                <StackPanel Orientation="Horizontal">
+                                    <CheckBox IsChecked="{Binding IsChecked}" VerticalContentAlignment="Center" Margin="3"/>
+                                    <TextBlock Text="{Binding Name}" TextWrapping="WrapWithOverflow"/>
+                                </StackPanel>
+                            </HierarchicalDataTemplate>
+                        </TreeView.ItemTemplate>
+                    </TreeView>
+                </TabItem>
+            </TabControl>
+
             <local:FileView x:Name="fileView" Grid.Column="1"
                   FlowDirection="LeftToRight"
                   FontSize="{Binding FontSize}"
                   FontFamily="{Binding FontFamily}"
-                  SelectedItem="{Binding DataContext.SelectedItem, ElementName=FsChapterViewer}"/>
+                  SelectedItem="{Binding SelectedItem, ElementName=FsChapterViewer}"
+                  x:FieldModifier="public"/>
         </Grid>
     </Grid>
 </UserControl>

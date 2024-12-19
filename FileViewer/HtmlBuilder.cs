@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media;
 
 namespace FileViewer
 {
@@ -19,17 +20,28 @@ namespace FileViewer
             <style>
                 body {{padding: 5px; line-height: 125%; text-align: justify; }}
                 line {{display: block; }}
+                .line:hover {{ background - color: #f0f0f0;  cursor: default; padding: 0.2px; }}
             </style>
         </head>
 
         <body dir=""auto"">
             {content}
             <script>
+        
         let originalText = document.body.innerHTML;
         let isVowelsReversed = false;
         let isCantillationReversed = false;
-
+        let isLinksMode = false;
         let isInline = false;
+
+        function ToggleIsLinksMode()
+        {{
+            isLinksMode = !isLinksMode;
+            lines.class.style.hover 
+            lones.click send messge to c#
+            }});
+        }};
+        
         function toggleInline()
         {{
             const lines = document.querySelectorAll('line');

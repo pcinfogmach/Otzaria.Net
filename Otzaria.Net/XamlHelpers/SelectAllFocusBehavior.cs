@@ -1,10 +1,8 @@
 ﻿using System.Windows.Controls.Primitives;
 using System.Windows.Controls;
 using System.Windows;
-using System.Runtime.CompilerServices;
-using FileSystemBrowser;
 
-namespace MyHelpers
+namespace MyXamlHelpers
 {
     public class TextBoxFocusBehavior
     {
@@ -50,12 +48,19 @@ namespace MyHelpers
             {
                 frameworkElement.GotFocus += SelectAll;
                 frameworkElement.PreviewMouseDown += IgnoreMouseButton;
+                frameworkElement.IsVisibleChanged += FrameworkElement_IsVisibleChanged; ;
             }
             else
             {
                 frameworkElement.GotFocus -= SelectAll;
                 frameworkElement.PreviewMouseDown -= IgnoreMouseButton;
             }
+        }
+
+        private static void FrameworkElement_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            if ((bool)e.NewValue == true && sender is FrameworkElement frameworkElement)
+                frameworkElement.Focus();
         }
 
         private static void OnCaptureFocusChanged

@@ -2,13 +2,13 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace FileSystemBrowser.Helpers
+namespace MyHelpers
 {
     public class ViewModelBase : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        protected virtual void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }

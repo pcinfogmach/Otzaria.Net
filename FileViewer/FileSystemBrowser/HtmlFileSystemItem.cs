@@ -86,7 +86,7 @@ namespace FileSystemBrowser
                             }
 
                             if(!loadTagsOnly)
-                                stringBuilder.Append($"<line>{line} </line>");
+                                stringBuilder.Append($"<line id=`{index}`>{line} </line>");
                         }
 
                     }

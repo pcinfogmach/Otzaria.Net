@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Input;
 
-namespace FileSystemBrowser.Helpers
+namespace MyHelpers
 {
     public class RelayCommand : ICommand
     {

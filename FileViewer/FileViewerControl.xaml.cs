@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 
@@ -29,6 +30,18 @@ namespace FileViewer
 
             fileView.Source = new Uri(tempFilePath);
             FsChapterViewer.RootItem = rootItem;
+            vm.FilePath = path;
+
+            fileView.WebMessageReceived += FileView_WebMessageReceived;
+        }
+
+        private void FileView_WebMessageReceived(object sender, Microsoft.Web.WebView2.Core.CoreWebView2WebMessageReceivedEventArgs e)
+        {
+            var message = JsonSerializer.Deserialize<Dictionary<string, string>>(e.WebMessageAsJson);
+            if (message != null && message.TryGetValue("getLinks", out var lineIndex))
+            {
+                vm.GetLinks(lineIndex);
+            }
         }
     }
 }

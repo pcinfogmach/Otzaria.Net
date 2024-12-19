@@ -4,7 +4,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 
-namespace MyHelpers
+namespace MyXamlHelpers
 {
     public class ListBoxKeyUpDownBehaviour
     {
@@ -28,13 +28,9 @@ namespace MyHelpers
             if (d is FrameworkElement frameworkElement)
             {
                 if ((bool)e.NewValue)
-                {
                     frameworkElement.PreviewKeyDown += FrameworkElement_PreviewKeyDown;
-                }
                 else
-                {
                     frameworkElement.PreviewKeyDown -= FrameworkElement_PreviewKeyDown;
-                }
             }
         }
 

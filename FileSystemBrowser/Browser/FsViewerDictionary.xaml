@@ -1,0 +1,158 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:fs="clr-namespace:FileSystemBrowser"
+                    xmlns:h="clr-namespace:MyHelpers">
+
+    <Style TargetType="fs:FsViewerControl">
+        <Style.Resources>
+            <Style TargetType="Button">
+                <Setter Property="Padding" Value="5"/>
+                <Setter Property="Background" Value="{Binding Background, RelativeSource={RelativeSource AncestorType=fs:FsViewerControl}}"/>
+                <Setter Property="Foreground" Value="{Binding Foreground,  RelativeSource={RelativeSource AncestorType=fs:FsViewerControl}}"/>
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="MinWidth" Value="{Binding ActualHeight, RelativeSource={RelativeSource Mode=Self}}"/>
+                <Setter Property="VerticalContentAlignment" Value="Center"/>
+                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            </Style>
+            <Style TargetType="Path">
+                <Setter Property="Fill" Value="{Binding Foreground,  RelativeSource={RelativeSource AncestorType=fs:FsViewerControl}}"/>
+                <Setter Property="Stretch" Value="Fill"/>
+                <Setter Property="Stroke" Value="{Binding Foreground,  RelativeSource={RelativeSource AncestorType=fs:FsViewerControl}}"/>
+            </Style>
+            <Style TargetType="TextBlock">
+                <Setter Property="Background" Value="{Binding Background,  RelativeSource={RelativeSource AncestorType=fs:FsViewerControl}}"/>
+                <Setter Property="Foreground" Value="{Binding Foreground,  RelativeSource={RelativeSource AncestorType=fs:FsViewerControl}}"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="LineStackingStrategy" Value="BlockLineHeight"/>
+                <Setter Property="LineHeight" Value="{Binding FontSize, RelativeSource={RelativeSource Mode=Self}}"/>
+            </Style>
+        </Style.Resources>
+
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <Grid x:Name="FsGrid" Style="{StaticResource FsGridStyle}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                <Button Command="{Binding GoHomeCommand, RelativeSource={RelativeSource AncestorType=fs:FsViewerControl}}" Margin="0,2.5,3,2.5">
+                                    <Path Stretch="Fill" Height="12" Width="12" Data="M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z"/>
+                                </Button>
+                                <Button Command="{Binding GoBackCommand, RelativeSource={RelativeSource AncestorType=fs:FsViewerControl}}" Margin="0,2.5,3,2.5">
+                                    <Path Stretch="Fill" Height="12" Width="12" Data="M13,20H11V8L5.5,13.5L4.08,12.08L12,4.16L19.92,12.08L18.5,13.5L13,8V20Z"/>
+                                </Button>
+                            </StackPanel>
+
+                            <Control MinWidth="100" Grid.Column="0">
+                                <Control.Template>
+                                    <ControlTemplate>
+                                        <Grid>
+                                            <TextBox x:Name="SearchTextBox" 
+                                                  Tag="הזן כתובת..."
+                                                Margin="3" Padding="2"
+                                                Text="{Binding SearchTerm, RelativeSource={RelativeSource AncestorType=fs:FsViewerControl}, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                                VerticalContentAlignment="Center"
+                                                h:TextBoxFocusBehavior.SelectAll="True"
+                                                h:TextBoxFocusBehavior.CaptureFocus="True">
+                                                <TextBox.InputBindings>
+                                                    <!--<KeyBinding Key="Return" Command="{Binding SearchCommand, RelativeSource={RelativeSource AncestorType=fs:FsViewerControl}}"/>-->
+                                                    <KeyBinding Key="Esc" Command="{Binding ClearSearchCommand, RelativeSource={RelativeSource AncestorType=fs:FsViewerControl}}"/>
+                                                </TextBox.InputBindings>
+                                            </TextBox>
+                                        </Grid>
+                                    </ControlTemplate>
+                                </Control.Template>
+                            </Control>
+                        </Grid>
+
+                        <ProgressBar Grid.Row="1"
+                               IsIndeterminate="{Binding IsSearching, RelativeSource={RelativeSource AncestorType=fs:FsViewerControl}}"
+                               Height="3" Background="Transparent" BorderThickness="0"/>
+
+                        <ListBox Grid.Row="2"
+                              BorderThickness="0"
+                              Background="Transparent"
+                              ItemsSource="{Binding Items, RelativeSource={RelativeSource AncestorType=fs:FsViewerControl}}"
+                              SelectionMode="Single"
+                              ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                              h:ListBoxKeyUpDownBehaviour.Enable="True">
+                            <ListBox.InputBindings>
+                                <KeyBinding Key="Esc" Command="{Binding GoBackCommand, RelativeSource={RelativeSource AncestorType=fs:FsViewerControl}}"/>
+                                <KeyBinding Key="Home" Command="{Binding GoHomeCommand, RelativeSource={RelativeSource AncestorType=fs:FsViewerControl}}"/>
+                            </ListBox.InputBindings>
+                            <ListBox.ItemContainerStyle>
+                                <Style TargetType="{x:Type ListBoxItem}">
+                                    <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                                                <ContentPresenter/>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Style.Triggers>
+                                        <Trigger Property="IsSelected" Value="True">
+                                            <Setter Property="Background" Value="#FFBEE6FD"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ListBox.ItemContainerStyle>
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <Button Grid.Column="0"
+                                          HorizontalContentAlignment="Left" 
+                                          FocusVisualStyle="{x:Null}"
+                                          Command="{Binding SelectItemCommand, RelativeSource={RelativeSource AncestorType=fs:FsViewerControl}}" 
+                                          CommandParameter="{Binding}"
+                                          Background="{Binding Background, RelativeSource={RelativeSource AncestorType=ListBoxItem}}">
+                                            <StackPanel>
+                                                <TextBlock Text="{Binding Name}"/>
+                                                <TextBlock x:Name="TagsBlock" Text="{Binding Tags}" Opacity="0.5"/>
+                                            </StackPanel>
+                                        </Button>
+                                        <Button x:Name="ChaptersExpanderButton" Grid.Column="1" Visibility="Collapsed"
+                                              Command="{Binding NavigateCommand, RelativeSource={RelativeSource AncestorType=fs:FsViewerControl}}"
+                                              CommandParameter="{Binding}">
+                                            <Path Fill="Black" Data="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"
+                                                Height="10" Width="10" Stretch="Fill"
+                                                VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                        </Button>
+                                    </Grid>
+                                    <DataTemplate.Triggers>
+                                        <DataTrigger Binding="{Binding Tags}" Value="">
+                                            <Setter TargetName="TagsBlock" Property="Visibility" Value="Collapsed"/>
+                                        </DataTrigger>
+                                        <MultiDataTrigger>
+                                            <MultiDataTrigger.Conditions>
+                                                <Condition Binding="{Binding IsFile, UpdateSourceTrigger=PropertyChanged}" Value="true"/>
+                                                <Condition Binding="{Binding HasChildren, UpdateSourceTrigger=PropertyChanged}" Value="true"/>
+                                            </MultiDataTrigger.Conditions>
+                                            <Setter TargetName="ChaptersExpanderButton" Property="Visibility" Value="Visible"/>
+                                        </MultiDataTrigger>
+                                    </DataTemplate.Triggers>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    
+</ResourceDictionary>

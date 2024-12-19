@@ -50,7 +50,6 @@ namespace FileViewer
             ToggleBlockInlineCommand = new RelayCommand(ToggleBlockInline);
             ToggleCantillationsCommand = new RelayCommand(ToggleCantillations);
             ToggleNikudCommand = new RelayCommand(ToggleNikud);
-            TogglePunctuationCommand = new RelayCommand(TogglePunctuation);
         }
 
         async void ToggleBlockInline()
@@ -92,24 +91,6 @@ namespace FileViewer
                 }}          
                 document.body.innerHTML = newText
                 isCantillationReversed = !isCantillationReversed;");
-        }
-
-        async void TogglePunctuation()
-        {
-            throw new System.NotImplementedException();
-            //if (this.CoreWebView2 != null)
-            //    await this.ExecuteScriptAsync($@"
-            //    var newText = originalText;
-            //    if (!isCantillationReversed)
-            //    {{
-            //        newText = newText.replace(/[,;?!.:]/g, """");
-            //    }}
-            //    if (isVowelsReversed)
-            //    {{
-            //        newText = newText.replace(/[\u05B0-\u05BD\u05C1\u05C2\u05C4\u05C5]/g, """");
-            //    }}          
-            //    document.body.innerHTML = newText
-            //    isCantillationReversed = !isCantillationReversed;");
         }
     }
 }

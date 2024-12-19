@@ -1,9 +1,8 @@
 ﻿using FileSystemBrowser;
-using System;
-using System.Collections.Generic;
+using Otzaria.Net;
 using System.IO;
-using System.Threading.Tasks;
 using System.Windows.Controls;
+using static Otzaria.Net.FileViewer.LinksViewModel;
 
 namespace FileViewer
 {
@@ -12,23 +11,38 @@ namespace FileViewer
     /// </summary>
     public partial class FileViewerControl : UserControl
     {
-        public FileViewerControl()
+        OtzariaView _otzariaView;
+        public FileViewerControl(FileSystemItem fileSystemItem, OtzariaView otzariaView)
         {
+            _otzariaView = otzariaView;
             InitializeComponent();
-            LoadItem("C:\\אוצריא\\אוצריא\\תנך\\תורה\\בראשית.txt");
+            LoadItem(fileSystemItem);
         }
 
-        async void LoadItem(string path)
+        async void LoadItem(FileSystemItem fileSystemItem)
         {
-            var rootItem = new HtmlFileSystemItem(path, path, false, 0);
-            string content = await rootItem.LoadContent(path, false, false);
+            string extension = Path.GetExtension(fileSystemItem.Path).ToLower();
 
-            string tempFilePath = Path.Combine(Path.GetTempPath(), $"{Path.GetFileNameWithoutExtension(path)}.html");
-            string html = HtmlBuilder.Build(content, Path.GetFileName(path));
-            File.WriteAllText(tempFilePath, html);
+            FileSystemItem rootItem = new FileSystemItem(fileSystemItem.Path, fileSystemItem.Path, true, 0);
+            
+            if (rootItem == null) return;
 
-            fileView.Source = new Uri(tempFilePath);
+            string content = await FileSystemItemHelper.LoadFileContent(fileSystemItem.Path, rootItem, false, false);
+
             FsChapterViewer.RootItem = rootItem;
+
+            int lineIndex = fileSystemItem.IsFile ? fileSystemItem.Index : 1;
+
+            fileView.NavigateToContent(fileSystemItem, content, lineIndex);
+        }
+
+        private void ListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (sender is ListBox listBox && listBox.SelectedItem is LinkItem linkItem)
+            {
+                _otzariaView.OpenLink(linkItem.path_2, (int)linkItem.line_index_2 - 2);
+                listBox.SelectedIndex = -1;
+            }               
         }
     }
 }

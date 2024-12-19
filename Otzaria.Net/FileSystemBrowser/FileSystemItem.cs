@@ -1,82 +1,48 @@
 ﻿using System;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Windows;
-
 namespace FileSystemBrowser
 {
-    public static class FileSystemItemHelper
-    {
-        // Define the custom order for directories
-        public static string[] directoryOrder = new string[] { "תנך", "מדרש", "משנה", "תוספתא", "תלמוד בבלי", "תלמוד ירושלמי", "הלכה", "שות", "קבלה", "ספרי מוסר", "חסידות", "מחשבת ישראל", "סדר התפילה", "ספרות עזר", "אודות התוכנה" ,
-                    "תורה", "נביאים", "כתובים", "תרגומים", "ראשונים", "אחרונים"};
-
-        // Define the custom order for file names (Hebrew book names)
-       public static string[] fileOrder = new string[]
-        {
-            // תורה
-            "בראשית", "שמות", "ויקרא", "במדבר", "דברים",
-
-            // נביאים ראשונים
-            "יהושע", "שופטים", "שמואל א", "שמואל ב", "מלכים א", "מלכים ב",
-
-            // נביאים אחרונים
-            "ישעיהו", "ירמיהו", "יחזקאל", 
-            "הושע", "יואל", "עמוס", "עובדיה", "יונה", "מיכה", 
-            "נחום", "חבקוק", "צפניה", "חגי", "זכריה", "מלאכי",
-
-            // כתובים
-            "תהלים", "משלי", "איוב",
-            "שיר השירים", "רות", "איכה", "קהלת", "אסתר",
-            "דניאל", "עזרא", "נחמיה", "דברי הימים א", "דברי הימים ב",
-
-            // תלמוד
-             "ברכות", "שבת", "עירובין", "פסחים", "שקלים",
-            "יומא", "סוכה", "ביצה", "ראש השנה", "תענית",
-            "מגילה", "מועד קטן", "חגיגה", "יבמות", "כתובות",
-            "נדרים", "נזיר", "סוטה", "גיטין", "קידושין",
-            "בבא קמא", "בבא מציעא", "בבא בתרא", "סנהדרין",
-            "מכות", "שבועות", "עבודה זרה", "הוריות", "זבחים",
-            "מנחות", "חולין", "בכורות", "ערכין", "תמורה",
-            "כריתות", "מעילה", "תמיד", "מדות", "קינים",
-            "נידה"
-        };
-    }
-
     public class FileSystemItem
     {
         public string Name { get; set; }
         public string Path { get; set; }
-        public string Tags { get; set; }
-        public bool IsDirectory { get; set; }
-        public int Level { get; set; } = -10;
-        public bool HasChildren { get => Children.Count > 0; }
+        public string Tags { get; set; } = "";
+        public bool IsFile { get; set; }
+        public int Level { get; set; }
+        public int Index { get; set; } // for generic usage
         public FileSystemItem Parent;
-        public ObservableCollection<FileSystemItem> Children { get; set; } = new ObservableCollection<FileSystemItem>();
+        public List<FileSystemItem> Children = new List<FileSystemItem>();
 
-        public FileSystemItem(string rootDirectory, string path, bool isDirectory, int level, FileSystemItem parent = null, string name = "")
+        public override string ToString() => Name;
+        public string ExtendedName() => Path + " " + Name;
+        public string Extension => System.IO.Path.GetExtension(Path);
+        public bool HasChildren => Children.Count > 0;
+
+        public FileSystemItem(string rootDirectory, string path, bool isFile, int level = short.MinValue, FileSystemItem parent = null, string name = "", int index = 0)
         {
             if (string.IsNullOrEmpty(path)) return;
 
-            Name = string.IsNullOrEmpty(name) ? System.IO.Path.GetFileNameWithoutExtension(path) : name;
-            Tags = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(path), System.IO.Path.GetExtension(path))
-            .Replace(rootDirectory, "")
-                .Trim('\\')
-                .Replace("\\", " \\ ");
             Path = path;
-            IsDirectory = isDirectory;
+            IsFile = isFile;
             Level = level;
             Parent = parent;
+            Index = index;
 
-            if (isDirectory) LoadChildren(rootDirectory);
+            Name = string.IsNullOrEmpty(name) ? System.IO.Path.GetFileNameWithoutExtension(path) : name;
+            Name = FileSystemItemHelper.CleanNonWordChars(Name);
+
+            Tags = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(path), System.IO.Path.GetExtension(path))
+                .Replace(rootDirectory, "").Trim('\\').Replace("\\", " \\ ");
+
+            if (!isFile) LoadChildren(rootDirectory);
+            Index = index;
         }
-
-        public override string ToString() => Name;
 
         void LoadChildren(string rootDirectory)
         {
+            int i = Index;
             var directories = Directory.GetDirectories(Path)
                 .OrderBy(dir =>
                 {
@@ -85,9 +51,7 @@ namespace FileSystemBrowser
                 });
 
             foreach (var directory in directories)
-            {
-                Children.Add(new FileSystemItem(rootDirectory, directory, true, Level + 1, this));
-            }
+                Children.Add(new FileSystemItem(rootDirectory, directory, false, Level + 1, this));
 
             var files = Directory.GetFiles(Path)
                 .OrderBy(file =>
@@ -97,12 +61,40 @@ namespace FileSystemBrowser
                 });
 
             foreach (var file in files)
+                Children.Add(new FileSystemItem(rootDirectory, file, true, 0, this));
+        }
+
+        public IEnumerable<FileSystemItem> EnumerateChildrenRecursive()
+        {
+            foreach (var child in Children)
             {
-                if (System.IO.Path.GetExtension(file).ToLower().Contains("txt") || System.IO.Path.GetExtension(file).ToLower().Contains("html"))
-                    Children.Add(new HtmlFileSystemItem(rootDirectory, file, false, Level + 1, this));
-                else 
-                    Children.Add(new FileSystemItem(rootDirectory, file, false, Level + 1, this));
+                yield return child;
+
+                foreach (var item in child.EnumerateChildrenRecursive())
+                    yield return item;
             }
+        }
+
+        public List<FileSystemItem> LevelOrderTraversal()
+        {
+            List<FileSystemItem> results = new List<FileSystemItem>();
+            List<FileSystemItem> currentLevel = new List<FileSystemItem>(this.Children);
+
+            while (currentLevel.Count > 0)
+            {
+                results.AddRange(currentLevel);
+                List<FileSystemItem> nextLevel = new List<FileSystemItem>();
+
+                foreach (var item in currentLevel)
+                {
+                    if (item.Children.Count > 0)
+                        nextLevel.AddRange(item.Children);
+                }
+
+                currentLevel = nextLevel;
+            }
+
+            return results;
         }
     }
 }

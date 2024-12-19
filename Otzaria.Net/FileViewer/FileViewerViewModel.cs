@@ -1,5 +1,4 @@
-﻿using MyHelpers;
-using System;
+﻿using MyModels;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;

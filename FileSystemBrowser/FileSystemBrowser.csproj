@@ -55,6 +55,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="Browser\FsViewerDictionary.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -63,9 +67,18 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Browser\FileSystemViewModel.cs" />
-    <Compile Include="Helpers\RelayCommand.cs" />
+    <Compile Include="Browser\FileSystemItem.cs" />
+    <Compile Include="Browser\FileSystemItemHelper.cs" />
+    <Compile Include="Browser\FileSystemSearcher.cs" />
+    <Compile Include="Browser\FsViewerControl.cs" />
+    <Compile Include="Helpers\BindingProxy.cs" />
+    <Compile Include="Helpers\Extensions.cs" />
+    <Compile Include="Helpers\GenericHelpers.cs" />
+    <Compile Include="Helpers\IntDivideConverter.cs" />
+    <Compile Include="Helpers\IntSubtractConverter.cs" />
     <Compile Include="Helpers\ListViewKeyUpDownBehaviour.cs" />
+    <Compile Include="Helpers\MyVisualTreeHelper.cs" />
+    <Compile Include="Helpers\RelayCommand.cs" />
     <Compile Include="Helpers\SelectAllFocusBehavior.cs" />
     <Compile Include="Helpers\ViewModelBase.cs" />
     <Compile Include="MainWindow.xaml.cs">
@@ -74,8 +87,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Models\FileSystemItem.cs" />
-    <Compile Include="Models\HtmlFileSystemItem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

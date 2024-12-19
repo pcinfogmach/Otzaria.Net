@@ -1,6 +1,4 @@
-﻿using FileSystemBrowser.Browser;
-using FileSystemBrowser.Models;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 
 namespace FileSystemBrowser

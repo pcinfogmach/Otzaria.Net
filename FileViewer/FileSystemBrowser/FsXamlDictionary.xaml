@@ -4,15 +4,6 @@
                     xmlns:h="clr-namespace:MyHelpers">
 
     <Style x:Key="HtmlNavControl" TargetType="fs:FsViewerControl">
-        <Setter Property="DataContext">
-            <Setter.Value>
-                <fs:FileSystemViewModel/>
-            </Setter.Value>
-        </Setter>
-
-        <Setter Property="SelectedItem" Value="{Binding SelectedItem, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-        <Setter Property="RootItem" Value="{Binding RootItem, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate>
@@ -50,7 +41,7 @@
                                 <ColumnDefinition Width="auto"/>
                             </Grid.ColumnDefinitions>
 
-                            <Button Grid.Column="1" Command="{Binding GoBackCommand}" Margin="0,2.5,3,2.5">
+                            <Button Grid.Column="1" Command="{Binding GoBackCommand, RelativeSource={RelativeSource AncestorType=fs:FsViewerControl}}" Margin="0,2.5,3,2.5">
                                 <Path Stretch="Fill" Height="10" Width="10" Data="M13,20H11V8L5.5,13.5L4.08,12.08L12,4.16L19.92,12.08L18.5,13.5L13,8V20Z"/>
                                 <Button.Resources>
                                     <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
@@ -70,13 +61,13 @@
                                             <TextBox x:Name="SearchTextBox" Style="{StaticResource PlaceHolderTextBox}"
                                                      Tag="חיפוש..."
                                                    Margin="3" Padding="2"
-                                                   Text="{Binding SearchTerm, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                                   Text="{Binding SearchTerm, RelativeSource={RelativeSource AncestorType=fs:FsViewerControl}, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                                                    VerticalContentAlignment="Center"
                                                    h:TextBoxFocusBehavior.SelectAll="True"
                                                    h:TextBoxFocusBehavior.CaptureFocus="True">
                                                 <TextBox.InputBindings>
-                                                    <KeyBinding Key="Return" Command="{Binding SearchCommand}"/>
-                                                    <KeyBinding Key="Esc" Command="{Binding ClearSearchCommand}"/>
+                                                    <KeyBinding Key="Return" Command="{Binding SearchCommand, RelativeSource={RelativeSource AncestorType=fs:FsViewerControl}}"/>
+                                                    <KeyBinding Key="Esc" Command="{Binding ClearSearchCommand,RelativeSource={RelativeSource AncestorType=fs:FsViewerControl}}"/>
                                                 </TextBox.InputBindings>
                                             </TextBox>
                                         </Grid>
@@ -86,19 +77,19 @@
                         </Grid>
 
                         <ProgressBar Grid.Row="1"
-                                  IsIndeterminate="{Binding IsSearching}"
+                                  IsIndeterminate="{Binding IsSearching, RelativeSource={RelativeSource AncestorType=fs:FsViewerControl}}"
                                   Height="3" Background="Transparent" BorderThickness="0"/> 
 
                         <ListBox Grid.Row="2"
                                  BorderThickness="0"
                                  Background="Transparent"
-                                 ItemsSource="{Binding Items}"
+                                 ItemsSource="{Binding Items, RelativeSource={RelativeSource AncestorType=fs:FsViewerControl}}"
                                  SelectionMode="Single"
                                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                                  h:ListBoxKeyUpDownBehaviour.Enable="True">
                             <ListBox.InputBindings>
-                                <KeyBinding Key="Esc" Command="{Binding GoBackCommand}"/>
-                                <KeyBinding Key="Home" Command="{Binding GoHomeCommand}"/>
+                                <KeyBinding Key="Esc" Command="{Binding GoBackCommand, RelativeSource={RelativeSource AncestorType=fs:FsViewerControl}}"/>
+                                <KeyBinding Key="Home" Command="{Binding GoHomeCommand, RelativeSource={RelativeSource AncestorType=fs:FsViewerControl}}"/>
                             </ListBox.InputBindings>
                             <ListBox.ItemContainerStyle>
                                 <Style TargetType="{x:Type ListBoxItem}">
@@ -128,7 +119,7 @@
                                         <Button Grid.Column="0"
                                              HorizontalContentAlignment="Left" 
                                              FocusVisualStyle="{x:Null}"
-                                             Command="{Binding DataContext.NavigateToItemCommand, ElementName=FsGrid}" 
+                                             Command="{Binding NavigateToItemCommand, RelativeSource={RelativeSource AncestorType=fs:FsViewerControl}}" 
                                              CommandParameter="{Binding}"
                                              Background="{Binding Background, RelativeSource={RelativeSource AncestorType=ListBoxItem}}">
                                             <StackPanel>
@@ -137,7 +128,7 @@
                                             </StackPanel>
                                         </Button>
                                         <Button x:Name="ChaptersExpanderButton" Grid.Column="1"
-                                                 Command="{Binding DataContext.LoadHtmlTagsCommand , ElementName=FsGrid}"
+                                                 Command="{Binding LoadHtmlTagsCommand, RelativeSource={RelativeSource AncestorType=fs:FsViewerControl}}"
                                                  CommandParameter="{Binding}">
                                             <Path Fill="Black" Data="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"
                                                    Height="10" Width="10" Stretch="Fill"

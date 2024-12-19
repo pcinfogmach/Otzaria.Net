@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Input;
 
-namespace MyHelpers
+namespace MyModels
 {
     public class RelayCommand : ICommand
     {
